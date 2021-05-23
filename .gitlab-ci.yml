@@ -1,0 +1,30 @@
+stages:
+  - branch_build
+
+image: docker:latest
+variables:
+  DOCKER_TLS_CERTDIR: ""
+  #DOCKER_HOST: tcp://localhost:2375  
+  #DOCKER_DRIVER: overlay2
+
+services:
+  - name: docker:dind
+  #- name : docker:18.09.7-dind 
+    command: ["--insecure-registry=registry.gitlab.com"]
+  
+branch_build:
+  stage: branch_build  
+  when: manual
+  allow_failure: false
+  #dependencies:
+    #- build_site
+  before_script:
+  #- npm install
+  - npm install -g bit-bin
+  - bit login --registry=https://node.bit.dev --scope=@bit --username=tsss --password=Nagaraju@7 --email=tsssinfotechtestrails@gmail.com
+
+
+  script:
+  - docker login  -u tsss_infotech -p Tsss123@ registry.gitlab.com
+  - docker build -t  registry.gitlab.com/tsssinfotechandinfra/mobile/admin:$CI_COMMIT_REF_SLUG .
+  - docker push  registry.gitlab.com/tsssinfotechandinfra/mobile/admin:$CI_COMMIT_REF_SLUG
